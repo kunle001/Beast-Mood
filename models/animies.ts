@@ -6,11 +6,13 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 interface AnimieAttrs {
   title: string;
   description:string;
+  image : string;
 };
 
 interface AnimieDocs extends mongoose.Document {
   title: string;
   description: number;
+  image: string;
 };
 
 interface AnimieModel extends mongoose.Model<AnimieDocs> {
@@ -25,6 +27,10 @@ const AnimieSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  image:{
+    type: String,
+    required: [true, "Your Animie should have an image"]
+  }
 
 },
   {

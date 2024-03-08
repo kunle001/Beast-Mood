@@ -31,7 +31,6 @@ const AnimieSchema = new mongoose.Schema({
     type: String,
     required: [true, "Your Animie should have an image"]
   }
-
 },
   {
     toJSON: {

@@ -61,7 +61,7 @@ export default (err: any, req: Request, res: Response, next: NextFunction) => {
 
     if (process.env.MODE === 'development') {
         sendErrorDev(err, res);
-    } else if (process.env.NODE_ENV === 'production') {
+    } else if (process.env.MODE === 'production') {
         let error: AppError;
 
         if (err.code === 11000) {

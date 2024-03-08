@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import cloudinary from "cloudinary"
-import { Animie } from "../models/animies";
+import { Animie } from "../models/animies.model";
 import catchAsync from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
@@ -31,16 +31,21 @@ export class AnimieController{
     })
 
     public CreateAnimie= catchAsync(async(req:Request, res:Response)=>{
-      const animie = await Animie.create({
-        ...req.body
+      const {title, genre,description,image}= req.body
+      const animie = Animie.build({
+        title, genre,description,image
       })
+
+      await animie.save()
 
       sendSuccess(res, 201, animie)
     })
 
     public DeleteAnimie= catchAsync(async(req:Request, res:Response)=>{
-      await Animie.findByIdAndDelete(req.params.id)
-
+      const animie= await Animie.findByIdAndDelete(req.params.id)
+      if (!animie){
+        throw new AppError("No animie with this id found", 404)
+      }
       sendSuccess(res, 201, "animie deleted successfully")
     })
 

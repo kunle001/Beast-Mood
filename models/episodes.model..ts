@@ -9,6 +9,7 @@ interface EpisodeAttrs {
     image: string;
     views: string
     url: string
+    animie: string
 };
 
 interface EpisodeDocs extends mongoose.Document {
@@ -17,7 +18,7 @@ interface EpisodeDocs extends mongoose.Document {
     image: string;
     views: string;
     url: string;
-
+    animie: string
 };
 
 interface EpisodeModel extends mongoose.Model<EpisodeDocs> {

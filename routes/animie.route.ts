@@ -1,6 +1,6 @@
 import express from "express"
 import { AnimieController } from "../controllers/animie.controller"
-import { upload, uploadVideo } from "../utils/uploadvideo"
+import { upload, uploadVideo } from "../utils/upload"
 
 const router= express.Router()
 const animieController= new AnimieController()

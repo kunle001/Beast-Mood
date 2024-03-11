@@ -1,26 +1,25 @@
 import { Request, Response } from "express";
 import cloudinary from "cloudinary"
 import { Animie } from "../models/animies.model";
-import catchAsync from "../utils/catchAsync";
+import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 
 
-cloudinary.v2.config({
-  cloud_name: 'dx8obnscc',
-  api_key: '568434899362299',
-  api_secret: 'eQNZbRpMwAMQVbHNHKatckaGMcQ',
-  secure: true,
-});
-
 
 export class AnimieController{
 
-    public GetAnimies = catchAsync(async(req:Request, res:Response)=>{
-      const data= await Animie.find()
+    public GetAnimies = async(req:Request, res:Response)=>{
+      try{
+        const data= await Animie.find()
 
       sendSuccess(res,200,data)
-    })
+
+      }catch(e:any){
+        throw new AppError(e, 500)
+      }
+      
+    }
 
     public GetOneAnimie= catchAsync(async(req:Request, res:Response)=>{
       const animie= await Animie.findOne({title: req.body.title})

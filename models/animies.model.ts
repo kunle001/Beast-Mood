@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 // Define available genres as enum
-enum Genre {
+export enum Genre {
   "Cars", 
   "Action",
   "Comedy",

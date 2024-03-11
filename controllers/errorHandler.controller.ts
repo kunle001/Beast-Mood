@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import AppError from '../utils/appError';
+import Joi from 'joi';
 
 // FUNCTION FOR HANDLING TOKEN AND MONGOOSE ERRORS
 const handleDuplicateErrorDB = (error: any) => {
@@ -13,8 +14,8 @@ const handleCastErrorDB = (error: any) => {
 };
 
 const handleValidationError = (error: any) => {
-    const message = `${error.errors.name.path}, is either not provided or has the wrong value`;
-    return new AppError(message, 400);
+    // const message = `${error.errors}, is either not provided or has the wrong value`;
+    return new AppError(error, 400);
 };
 
 const handleJWTError = (error: any) => {
@@ -24,6 +25,11 @@ const handleJWTError = (error: any) => {
 
 const handleTokenExpired = (error: any) => {
     const message = 'Token Expired , Login again';
+    return new AppError(message, 400);
+};
+
+const handleValidation = (error: any) => {
+    const message = error;
     return new AppError(message, 400);
 };
 
@@ -74,7 +80,12 @@ export default (err: any, req: Request, res: Response, next: NextFunction) => {
             error = handleJWTError(err);
         } else if (err.name === 'TokenExpiredError') {
             error = handleTokenExpired(err);
-        } else {
+        } 
+        else if (err instanceof Joi.ValidationError){
+            error = handleValidation(err)
+        }
+        else {
+            console.log(err)
             error = new AppError('something went wrong', 400);
         }
 

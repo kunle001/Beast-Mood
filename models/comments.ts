@@ -4,6 +4,7 @@ export interface IComment extends Document {
   name: string;
   animie: Types.ObjectId;
   message: string;
+  creationDate:Date;
 }
 
 
@@ -20,8 +21,9 @@ const commentSchema = new Schema<IComment>({
   message: {
     type: String,
     required: true,
-  }
-}, { timestamps: true});
+  },
+  creationDate: { type: Date, default: Date.now }
+});
 
 const Comment = mongoose.model("Comment", commentSchema);
 

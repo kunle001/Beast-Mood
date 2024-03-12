@@ -1,14 +1,19 @@
 import express from "express"
 import { AnimieController } from "../controllers/animie.controller"
-import { upload, uploadVideo } from "../utils/upload"
+import { upload, uploadImage, uploadSingleImage, uploadVideo } from "../utils/upload"
+import { ValidationSchema } from "../utils/global"
+import { validateRequest } from "../utils/validators"
 
 const router= express.Router()
 const animieController= new AnimieController()
+const validator= new ValidationSchema()
 
 router.route("/").get(animieController.GetAnimies)
-router.route("/upload-animie").post(
-    upload.single('video'),
-    uploadVideo
+router.route("/create").post(
+    uploadSingleImage.single("image"),
+    uploadImage, 
+    validateRequest(validator.createAnimie()),
+    animieController.CreateAnimie
 )
 
 export {router as AnimieRouter}

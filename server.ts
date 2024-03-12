@@ -2,15 +2,24 @@ import 'express-async-errors';
 import { ConnectOptions } from 'mongoose'
 import mongoose from "mongoose";
 import { app } from './app';
+import dotenv from "dotenv"
+import cloudinary from "cloudinary" 
 
-
+dotenv.config({ path: './.env' });
+// configurer cloudinary
+cloudinary.v2.config({
+    cloud_name: 'dx8obnscc',
+    api_key: '568434899362299',
+    api_secret: 'eQNZbRpMwAMQVbHNHKatckaGMcQ',
+    secure: true,
+  });
 
 
 const start = async () => {
     try {
-        await mongoose.connect(process.env.DB!, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
+        await mongoose.connect("mongodb://localhost:27017/animie", {
+            // useNewUrlParser: true,
+            // useUnifiedTopology: true,
         } as ConnectOptions);
 
         console.log('DB conected')
@@ -21,4 +30,5 @@ const start = async () => {
         console.log("Listening on port 3000");
     });
 }
+
 start();

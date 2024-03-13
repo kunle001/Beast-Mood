@@ -26,5 +26,6 @@ app.all('*', (req, res, next) => {
 });
 
 app.use(errorHandlerController)
+
 // Export app
 export {app}

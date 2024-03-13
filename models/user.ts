@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   comparePassword: (enteredPassword: string) => boolean;
+  resetToken:string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -21,6 +22,9 @@ const userSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
+  },
+  resetToken: {
+    type: String,
   },
 });
 

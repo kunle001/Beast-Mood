@@ -6,7 +6,7 @@ const authController = new AuthController()
 
 AuthRouter.post('/register', authController.Register);
 AuthRouter.post('/login', authController.Login)
-AuthRouter.post('/login', authController.logOut)
+AuthRouter.post('/logout', authController.logOut)
 
 
 export default AuthRouter;

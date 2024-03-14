@@ -56,7 +56,7 @@ class AuthController {
       //Generate and set password reset token
       const getToken = createTokenUser(user);
       
-      user.resetToken = generateToken(getToken);
+      user.resetToken = generateToken(getToken.userId);
       await user.save();
 
 

@@ -3,7 +3,7 @@ import User from "../models/user";
 import { generateToken, clearToken } from "../utils/auth";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
-import catchAsync from "../utils/catchAsync";
+import {catchAsync} from "../utils/catchAsync";
 import passLink from '../email_handler/resetPassword.template'
 import {createTokenUser} from '../utils/createTokenUser'
 
@@ -23,7 +23,7 @@ class AuthController {
     });
   
     if (user) {
-      generateToken(res, user._id);
+      generateToken(user._id);
       console.log(user)
       return sendSuccess(res, 201, user);
     } else {
@@ -38,7 +38,7 @@ class AuthController {
     const user = await User.findOne({email})
 
     if(user && (await user.comparePassword(password))){
-      generateToken(res, user._id)
+      generateToken(user._id)
       return sendSuccess(res, 200, user);
     }
     else{
@@ -46,21 +46,21 @@ class AuthController {
     }
   })
 
-  // public forgotPassword = catchAsync(async(req: Request, res: Response) => {
-  //   const resetLink = passLink;
-  //   const {email} = req.body;
+  public forgotPassword = catchAsync(async(req: Request, res: Response) => {
+    const resetLink = passLink;
+    const {email} = req.body;
     
-  //   const user = await User.findOne({email});
-  //   if (!user) throw new AppError('The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.', 401);
+    const user = await User.findOne({email});
+    if (!user) throw new AppError('The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.', 401);
 
-  //     //Generate and set password reset token
-  //     const getToken = createTokenUser(user);
+      //Generate and set password reset token
+      const getToken = createTokenUser(user);
       
-  //     user.resetToken = generateToken(res, getToken);
-  //     await user.save();
+      user.resetToken = generateToken(getToken);
+      await user.save();
 
 
-  // });
+  });
   
   public logOut = (req: Request, res: Response) => {
     clearToken(res);

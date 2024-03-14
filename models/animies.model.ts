@@ -31,6 +31,7 @@ interface AnimieDoc extends mongoose.Document {
   image: string;
   genre: Genre; // Use the Genre enum
   rating?: number;
+  episodes: mongoose.Types.ObjectId[];
 }
 
 // An interface that describes the properties that a animie model has
@@ -59,17 +60,11 @@ const AnimieSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(Genre), // Use the Genre enum
       required: [true, "Your Animie should have a genre"]
-    }
+    }, 
   },
-  {
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id
-        delete ret._id
-        delete ret.__v
-      }
-    }
-  }
+  
+    { toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  
 );
 
 AnimieSchema.set('versionKey', 'version');
@@ -82,9 +77,17 @@ AnimieSchema.pre('save', function (done) {
   done();
 });
 
+AnimieSchema.virtual("episodes", {
+  ref:"Episode",
+  foreignField: "animie",
+  localField: "_id"
+})
+
 AnimieSchema.statics.build = (attrs: AnimieAttrs) => {
   return new Animie(attrs);
 };
+
+
 
 const Animie = mongoose.model<AnimieDoc, AnimieModel>('Animie', AnimieSchema);
 

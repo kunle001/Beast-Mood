@@ -16,4 +16,27 @@ router.route("/create").post(
     animieController.CreateAnimie
 )
 
+router.route("/create").patch(
+    uploadSingleImage.single("image"),
+    uploadImage, 
+    validateRequest(validator.updateAnime()),
+    animieController.UpdateAnimie
+)
+
+
+
+router.route("/:id").get(
+    animieController.GetOneAnimie
+)
+
+router.route("/:id").delete(
+    animieController.DeleteAnimie
+)
+
+router.route("/").get(
+    animieController.GetAnimies
+)
+
+
+
 export {router as AnimieRouter}

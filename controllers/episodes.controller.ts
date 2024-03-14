@@ -3,15 +3,19 @@ import {catchAsync} from "../utils/catchAsync";
 import { Episode } from "../models/episodes.model.";
 import AppError from "../utils/appError";
 import { sendSuccess } from "../utils/response";
+import { Animie } from "../models/animies.model";
 
 
 
 
 export class EpisodesController{
     public CreateEpisode= catchAsync(async(req:Request, res:Response)=>{
-        console.log(req.body)
+       const {
+        image, url, episode_number,title,description,animie
+       }= req.body
+
         const episode= Episode.build({
-            ...req.body,
+            image, url, episode_number,title,description,animie
         })
 
         await episode.save()
@@ -30,10 +34,18 @@ export class EpisodesController{
     })
 
     public GetEpisode= catchAsync(async(req:Request, res:Response)=>{
-        
+        const episode = await Episode.findById(req.params.id)
+        sendSuccess(res, 200, episode)
     })
 
     public GetEpisodes= catchAsync(async(req:Request, res:Response)=>{
-        
+        const animie_episodes= await Episode.find({animie: req.params.id})
+        sendSuccess(res, 200, animie_episodes)
+    })
+
+    public UploadVideo= catchAsync(async(req:Request, res:Response)=>{
+        sendSuccess(res, 200,{
+            url: req.body.url
+        })
     })
 }

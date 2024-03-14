@@ -1,12 +1,12 @@
 const {sendEmail} = require("./sendEmail")
 
 
-const forgotPasswordLink = async (user, emailUser, link) => {
+const forgotPasswordLink = async (user: { email: string; name: string; },link: string) => {
     const transporter = sendEmail();
 
    
     const mailOptions = {
-        from: emailUser,
+        from: process.env.EMAIL_USERNAME,
         to: user.email,
         subject: "Password Recovery",
         html: `<div style="background-color:white; padding-bottom:2rem; ">
@@ -25,7 +25,7 @@ const forgotPasswordLink = async (user, emailUser, link) => {
                 src=https://res.cloudinary.com/drho9mnyb/image/upload/v1663944871/Ribi.png
                 /></div>
             
-                <p style = " margin: auto; padding:2rem;text-align: center; font-family: 'Lato'; font-size:18px";> Hi ${user.firstname}, <br>Click the button below to reset your password.</p> 
+                <p style = " margin: auto; padding:2rem;text-align: center; font-family: 'Lato'; font-size:18px";> Hi ${user.name}, <br>Click the button below to reset your password.</p> 
             <div class="btnContainer" ><a href='${link}style=" text-decoration: none; cursor: pointer; background-color: #01051A; border: none; border-radius: 8px; 
             margin-top: 6rem; color: white; padding: 15px; text-align: center;  
             display:block; font-size: 16px; margin:auto; width: 250px; min-width: 250px;" >Reset Password</a>
@@ -36,7 +36,7 @@ const forgotPasswordLink = async (user, emailUser, link) => {
             </div>`
     };
     
-    transporter.sendMail(mailOptions, (error, result) => {
+    transporter.sendMail(mailOptions, (error: string, result: string) => {
         if (error){
         console.log(error)
            console.log( 'Opps error occured')

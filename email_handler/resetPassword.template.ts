@@ -1,7 +1,7 @@
 import sendEmail from "./sendEmail"
 
 
-const passLink = (user: {name: any; email: any; }, link: any, emailUser: any) => {
+const passLink = (user: {name: string; email: string; }, link: string,) => {
   const transporter = sendEmail();
 
     const registrationHTML = `
@@ -33,7 +33,7 @@ const passLink = (user: {name: any; email: any; }, link: any, emailUser: any) =>
   `;
    
   const mailOptions = {
-    from: emailUser,
+    from: process.env.EMAIL_USERNAME,
     to: user.email,
     subject: "Password Recovery",
     html: registrationHTML

@@ -2,7 +2,7 @@ import * as nodemailer from "nodemailer";
 
 const sendEmail = () => {
     
-    const emailUser = process.env.EMAIL_USERNAME;
+    // const emailUser = process.env.EMAIL_USERNAME;
     const pass = process.env.EMAIL_PASSWORD;
 
     const transporter = nodemailer.createTransport({
@@ -10,7 +10,7 @@ const sendEmail = () => {
         service:String(process.env.SERVICE),
         port:Number(process.env.GMAIL_PORT),
         auth: {
-            user: emailUser,
+            user: process.env.EMAIL_USERNAME,
             pass: pass,
         },
         tls: { rejectUnauthorized: false }

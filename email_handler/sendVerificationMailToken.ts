@@ -3,7 +3,7 @@ const {sendEmail} = require("./sendEmail")
 
 
 
-const sendVerificationMail = async (user: { generateVerificationToken: () => any; email: any; name: any; id: any; }, emailUser: any) => {
+const sendVerificationMail = async (user: { generateVerificationToken: () => any; email: string; name: string; id: string; }) => {
     const transporter = sendEmail();
 
     const token = user.generateVerificationToken();
@@ -12,7 +12,7 @@ const sendVerificationMail = async (user: { generateVerificationToken: () => any
     await token.save();
 
     const mailOptions = {
-        from: emailUser,
+        from:  process.env.EMAIL_USERNAME!,
         to: user.email,
         subject: "Verify Your Email",
         html: `

@@ -59,6 +59,11 @@ class AuthController {
       user.resetToken = generateToken(getToken.userId);
       await user.save();
 
+      const link = `${process.env.CLIENT_URL}/reset-password/${user.resetToken}`;
+
+      const formattedEmail = resetLink(user, link);
+
+      sendEmail(email, "Reset your Ribi Password", formattedEmail);
 
   });
   

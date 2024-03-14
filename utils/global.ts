@@ -37,8 +37,17 @@ export class ValidationSchema {
         return Joi.object({
             title: this.mediumTextRq(true), 
             description: this.largeTextRq(true), 
-            image : this.mediumTextRq(),
+            image : this.largeTextRq(),
             genre: Joi.string().valid(...Object.values(Genre)).required()
+        })
+    }
+
+    public updateAnime(): Joi.ObjectSchema<any> {
+        return Joi.object({
+            title: this.mediumTextRq(), 
+            description: this.largeTextRq(), 
+            image : this.mediumTextRq(),
+            genre: Joi.string().valid(...Object.values(Genre))
         })
     }
 

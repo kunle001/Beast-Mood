@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import cloudinary from "cloudinary"
 import User from "../models/user.model";
-import catchAsync from "../utils/catchAsync";
+import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 import cryptoJs from "crypto-js";

@@ -65,8 +65,34 @@ class AuthController {
 
       const formattedEmail = resetLink(user, link);
 
-      sendEmail();
+      sendEmail(email, "Reset your Ribi Password", formattedEmail);
 
+  });
+
+  public resetPassword = catchAsync(async(req: Request, res: Response) => {
+    try {
+      const resetToken = req.params.token 
+  
+      const targetUser = await User.findOne({resetToken})
+  
+      if (targetUser) {
+        const { newPassword } = req.body;
+        targetUser.password = newPassword;
+
+        targetUser.resetToken = undefined  // Please help me out here too: "Type 'undefined' is not assignable to type 'string'.""
+        
+        targetUser.save()
+  
+        return sendSuccess(res, 200, {
+          message:"Password updated successfully."
+        })
+  
+      } else {
+        throw new AppError("Password reset link has expired.",403)
+      }
+    } catch (err) {
+      throw new AppError("User not found / password incorrect", 500);
+    }
   });
   
   public logOut = (req: Request, res: Response) => {

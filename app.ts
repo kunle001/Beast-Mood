@@ -17,6 +17,7 @@ app.use(bodyParser.json())
 
 
 app.use("/api/v1/.animie", AnimieRouter)
+app.use("/api/v1/.auth", AuthRouter)
 
 
 app.all('*', (req, res, next) => {

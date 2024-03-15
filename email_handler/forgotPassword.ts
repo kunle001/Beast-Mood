@@ -1,4 +1,4 @@
-const {sendEmail} = require("./sendEmail")
+import sendEmail  from "./sendEmail"
 
 
 const forgotPasswordLink = async (user: { email: string; name: string; },link: string) => {
@@ -36,7 +36,7 @@ const forgotPasswordLink = async (user: { email: string; name: string; },link: s
             </div>`
     };
     
-    transporter.sendMail(mailOptions, (error: string, result: string) => {
+    transporter.sendMail(mailOptions, (error, result) => {
         if (error){
         console.log(error)
            console.log( 'Opps error occured')

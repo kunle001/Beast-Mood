@@ -1,7 +1,7 @@
-import mongoose, {Types, Document, Schema } from "mongoose";
+import mongoose, {Types, ObjectId, Document, Schema } from "mongoose";
 
 export interface IUser extends Document {
-  userId: string;
+  userId: Types.ObjectId;
   token: string;
   createdAt: Date;
 }
@@ -22,4 +22,6 @@ const tokenSchema = new mongoose.Schema({
     expires: 3600,// this is the expiry time in seconds(1h)
   },
 });
-module.exports = mongoose.model("Token", tokenSchema);
+const Token = mongoose.model("Token", tokenSchema);
+
+export default Token;

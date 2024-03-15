@@ -1,11 +1,13 @@
 import { Request, Response, response } from "express";
-import User from "../models/user";
+import User from "../models/user.model";
+import Token from "../models/token.model";
 import { generateToken, clearToken } from "../utils/auth";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 import {catchAsync} from "../utils/catchAsync";
 import passLink from '../email_handler/resetPassword.template'
-import {createTokenUser} from '../utils/createTokenUser'
+import {createTokenUser} from '../utils/createTokenUser';
+import sendEmail from '../email_handler/sendEmail';
 
 class AuthController {
   public Register = catchAsync(async(req: Request, res: Response) =>{
@@ -63,7 +65,7 @@ class AuthController {
 
       const formattedEmail = resetLink(user, link);
 
-      sendEmail(email, "Reset your Ribi Password", formattedEmail);
+      sendEmail();
 
   });
   

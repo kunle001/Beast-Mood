@@ -1,16 +1,16 @@
 import mongoose, {Types, ObjectId, Document, Schema } from "mongoose";
 
-export interface IUser extends Document {
+export interface IToken extends Document {
   userId: Types.ObjectId;
   token: string;
   createdAt: Date;
 }
 
-const tokenSchema = new mongoose.Schema({
+const tokenSchema = new Schema<IToken>({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "user",
+    ref: "User",
   },
   token: {
     type: String,

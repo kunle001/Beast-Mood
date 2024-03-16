@@ -65,7 +65,7 @@ class AuthController {
 
       const formattedEmail = resetLink(user, link);
 
-      sendEmail(email, "Reset your Ribi Password", formattedEmail);
+      sendEmail(email);
 
   });
 
@@ -79,7 +79,7 @@ class AuthController {
         const { newPassword } = req.body;
         targetUser.password = newPassword;
 
-        targetUser.resetToken = undefined  // Please help me out here too: "Type 'undefined' is not assignable to type 'string'.""
+        targetUser.resetToken = undefined!  // Please help me out here too: "Type 'undefined' is not assignable to type 'string'.""
         
         targetUser.save()
   

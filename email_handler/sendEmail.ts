@@ -1,6 +1,6 @@
 import * as nodemailer from "nodemailer";
 
-const sendEmail = () => {
+const sendEmail = (email?:string) => {
     
     // const emailUser = process.env.EMAIL_USERNAME;
     const pass = process.env.EMAIL_PASSWORD;
@@ -10,7 +10,7 @@ const sendEmail = () => {
         service:String(process.env.SERVICE),
         port:Number(process.env.GMAIL_PORT),
         auth: {
-            user: process.env.EMAIL_USERNAME,
+            user:process.env.EMAIL_USERNAME,
             pass: pass,
         },
         tls: { rejectUnauthorized: false }

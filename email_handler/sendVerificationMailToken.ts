@@ -12,7 +12,7 @@ const sendVerificationMail = async (user: { generateVerificationToken: () => any
     await token.save();
 
     const mailOptions = {
-        from:  process.env.EMAIL_USERNAME!,
+        from:process.env.EMAIL_USERNAME,
         to: user.email,
         subject: "Verify Your Email",
         html: `
@@ -47,7 +47,7 @@ const sendVerificationMail = async (user: { generateVerificationToken: () => any
         </body>`
     };
     
-    transporter.sendMail(mailOptions, (error: any, result: any) => {
+    transporter.sendMail(mailOptions, (error: string, result: string) => {
         if (error){
         console.log(error)
            console.log( 'Opps error occured')

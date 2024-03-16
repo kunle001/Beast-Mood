@@ -1,8 +1,7 @@
 import * as nodemailer from "nodemailer";
 
-const sendEmail = (email?:string) => {
+const sendEmail = () => {
     
-    // const emailUser = process.env.EMAIL_USERNAME;
     const pass = process.env.EMAIL_PASSWORD;
 
     const transporter = nodemailer.createTransport({

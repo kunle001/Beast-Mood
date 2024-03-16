@@ -7,7 +7,7 @@ import AppError from "../utils/appError";
 import {catchAsync} from "../utils/catchAsync";
 import passLink from '../email_handler/resetPassword.template'
 import {createTokenUser} from '../utils/createTokenUser';
-import sendEmail from '../email_handler/sendEmail';
+
 
 class AuthController {
   public Register = catchAsync(async(req: Request, res: Response) =>{
@@ -32,7 +32,6 @@ class AuthController {
       throw new AppError("The user already exists", 400);
     }
   });
-
 
   public Login = catchAsync(async(req: Request, res: Response) => {
 
@@ -63,9 +62,9 @@ class AuthController {
 
       const link = `${process.env.CLIENT_URL}/reset-password/${user.resetToken}`;
 
-      const formattedEmail = resetLink(user, link);
+     await resetLink(user, link);
 
-      sendEmail(email);
+     return sendSuccess(res, 200, {message:"A link to rest your password has been sent to your email."})
 
   });
 
@@ -79,7 +78,7 @@ class AuthController {
         const { newPassword } = req.body;
         targetUser.password = newPassword;
 
-        targetUser.resetToken = undefined!  // Please help me out here too: "Type 'undefined' is not assignable to type 'string'.""
+        targetUser.resetToken = undefined!
         
         targetUser.save()
   

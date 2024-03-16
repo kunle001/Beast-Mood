@@ -1,7 +1,7 @@
 import sendEmail from "./sendEmail"
 
 
-const passLink = (user: {name: string; email: string; },  link: string,) => {
+const passLink = async(user: {name: string; email: string; },  link: string,) => {
   const transporter = sendEmail();
 
     const registrationHTML = `

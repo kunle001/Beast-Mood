@@ -3,8 +3,7 @@ import sendEmail  from "./sendEmail"
 
 const forgotPasswordLink = async (user: { email: string; name: string; },link: string) => {
     const transporter = sendEmail();
-
-   
+    
     const mailOptions = {
         from: process.env.EMAIL_USERNAME,
         to: user.email,

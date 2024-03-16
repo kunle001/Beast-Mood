@@ -2,7 +2,7 @@ import express from 'express'
 import { AnimieRouter } from "./routes/animie.route"
 import AuthRouter  from "./routes/auth.route"
 import bodyParser from "body-parser"
-import mongoSanitize from "mongo-sanitize"
+// import mongoSanitize from "mongo-sanitize"
 import errorHandlerController from "./controllers/errorHandler.controller"
 import AppError from "./utils/appError"
 
@@ -11,7 +11,7 @@ import AppError from "./utils/appError"
 const app= express()
 
 app.use(bodyParser.json())
-app.use(mongoSanitize)
+// app.use(mongoSanitize)
 
 
 

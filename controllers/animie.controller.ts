@@ -22,11 +22,13 @@ export class AnimieController {
     }
 
     public GetOneAnimie= catchAsync(async(req:Request, res:Response)=>{
-      const animie= await Animie.findOne({title: req.body.title})
+      const animie= await Animie.findById(req.params.id).populate("episodes")
       
       if (!animie){
         throw new AppError("no animie with this name", 404)
       }
+
+      sendSuccess(res,200,animie)
     })
 
     public CreateAnimie= catchAsync(async(req:Request, res:Response)=>{

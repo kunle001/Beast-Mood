@@ -16,17 +16,19 @@ export class ValidationSchema {
         console.log("Got to validation")
         return Joi.object({
             title: this.mediumTextRq(true),
-            url: this.mediumTextRq(true),
-            image: this.mediumTextRq(true),
-            description: this.largeTextRq()
+            animie: this.mediumTextRq(true),
+            url: this.largeTextRq(true),
+            image: this.largeTextRq(true),
+            description: this.largeTextRq(),
+            episode_number: Joi.number().required()
         })
     }
 
     public updateEpisode(): Joi.ObjectSchema<any> {
         return Joi.object({
             title: this.mediumTextRq(),
-            url: this.mediumTextRq(),
-            image: this.mediumTextRq(),
+            url: this.largeTextRq(),
+            image: this.largeTextRq(),
             description: this.largeTextRq()
         })
     }
@@ -35,8 +37,17 @@ export class ValidationSchema {
         return Joi.object({
             title: this.mediumTextRq(true), 
             description: this.largeTextRq(true), 
-            image : this.mediumTextRq,
-            genre: Joi.string().valid(Genre).required()
+            image : this.largeTextRq(),
+            genre: Joi.string().valid(...Object.values(Genre)).required()
+        })
+    }
+
+    public updateAnime(): Joi.ObjectSchema<any> {
+        return Joi.object({
+            title: this.mediumTextRq(), 
+            description: this.largeTextRq(), 
+            image : this.mediumTextRq(),
+            genre: Joi.string().valid(...Object.values(Genre))
         })
     }
 

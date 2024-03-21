@@ -1,76 +1,72 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-
-// an interface that describes the properties that are required to create a new user. 
 
 interface EpisodeAttrs {
     title: string;
-    description: string;
+    description?: string; // Change type to string
     image: string;
-    views: string
-    url: string
-    animie: string
-};
-
-interface EpisodeDocs extends mongoose.Document {
-    title: string;
-    description: number;
-    image: string;
-    views: string;
     url: string;
-    animie: string
-};
+    animie: mongoose.Types.ObjectId; 
+    episode_number: number
+}
 
-interface EpisodeModel extends mongoose.Model<EpisodeDocs> {
-    build(attrs: EpisodeAttrs): EpisodeDocs;
-};
+interface EpisodeDoc extends Document {
+    title: string;
+    description?: string; // Change type to string
+    image: string;
+    views: number; // Change type to string
+    url: string;
+    animie: mongoose.Types.ObjectId;
+    episode_number: number
+}
 
-const EpisodeSchema = new mongoose.Schema({
+interface EpisodeModel extends Model<EpisodeDoc> {
+    build(attrs: EpisodeAttrs): EpisodeDoc;
+}
+
+const episodeSchema = new Schema<EpisodeDoc>({
     title: {
         type: String,
-        required: [true, 'your Episode should have a title']
+        required: [true, 'Your episode should have a title']
     },
-    description: {
-        type: String
-    },
-    url: {
-        type: String
-    },
+    description: String, // Change type to String
+    url: String, // Change type to String
+    image: String,
     animie: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Animie"
+        ref: 'Animie'
     }, 
+    views: {
+        type: Number,
+        default: 0,
+    },
     episode_number: {
         type: Number,
-        required: [true, 'you must parse episode number']
+        required: [true, "episode_number is required"]
     }
-},
-    {
-        toJSON: {
-            transform(doc, ret) {
-                ret.id = ret._id
-                delete ret._id
-            },
-            virtuals: true,
-            
+}, {
+    toJSON: {
+        transform(doc, ret) {
+            ret.id = ret._id;
+            delete ret._id;
         },
-        toObject:{virtuals:true}
+        virtuals: true
+    },
+    toObject: { virtuals: true }
 });
 
+episodeSchema.set('versionKey', 'version');
+episodeSchema.plugin(updateIfCurrentPlugin);
 
-
-EpisodeSchema.set('versionKey', 'version')
-EpisodeSchema.plugin(updateIfCurrentPlugin);
-
-EpisodeSchema.pre('save', function (done) {
-    this.increment()
+episodeSchema.pre('save', function (done) {
+    this.increment();
     done();
 });
 
-EpisodeSchema.statics.build = (attrs: EpisodeAttrs) => {
-    return new Episode(attrs)
+episodeSchema.statics.build = (attrs: EpisodeAttrs) => {
+    return new Episode(attrs);
 };
 
-const Episode = mongoose.model<EpisodeDocs, EpisodeModel>('Episode', EpisodeSchema)
+const Episode = mongoose.model<EpisodeDoc, EpisodeModel>('Episode', episodeSchema);
 
-export { Episode }
+export { Episode };

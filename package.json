@@ -2,7 +2,7 @@
   "name": "beast-mood",
   "version": "1.0.0",
   "description": "a manga web application",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
     "test": "npm test",
     "start": "nodemon server.ts"

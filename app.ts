@@ -1,6 +1,7 @@
 import express from "express"
 import { AnimieRouter } from "./routes/animie.route"
-import { CommentRouter } from "./routes/comment.route"
+import { AnimieCommentRouter } from "./routes/animieComments.route"
+import { EpisodeCommentRouter } from "./routes/episodeComment.route"
 import bodyParser from "body-parser"
 import mongoSanitize from "mongo-sanitize"
 import errorHandlerController from "./controllers/errorHandler.controller"
@@ -18,7 +19,8 @@ app.use(bodyParser.json())
 
 app.use("/api/v1/animie", AnimieRouter)
 app.use("/api/v1/episode", EpisodeRouter)
-app.use("/api/v1/comment", CommentRouter)
+app.use("/api/v1/animieComment", AnimieCommentRouter)
+app.use("/api/v1/episodeComment", EpisodeCommentRouter)
 
 
 

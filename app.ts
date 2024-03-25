@@ -1,8 +1,6 @@
 import express from 'express'
-import express from 'express'
 import { AnimieRouter } from "./routes/animie.route"
 import UserRouter from "./routes/user.route"
-import AuthRouter  from "./routes/auth.route"
 import { AnimieCommentRouter } from "./routes/animieComments.route"
 import { EpisodeCommentRouter } from "./routes/episodeComment.route"
 import bodyParser from "body-parser"
@@ -29,7 +27,6 @@ app.use("/api/v1/animieComment", AnimieCommentRouter)
 app.use("/api/v1/episodeComment", EpisodeCommentRouter)
 
 app.use("/api/v1/.animie", AnimieRouter)
-app.use("/api/v1/.auth", AuthRouter)
 app.use("/api/v1/.user", UserRouter)
 
 

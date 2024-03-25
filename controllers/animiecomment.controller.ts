@@ -11,11 +11,11 @@ export class CommentController{
     const { message, animieId } = req.body;
 
     if(req.body.userId){
-        const comment = new AnimieComment({message, animieId });
-        await comment.save();
-        sendSuccess(res, 201, comment)
+      const comment = new AnimieComment({message, animieId });
+      await comment.save();
+      sendSuccess(res, 201, comment)
     }else{
-        throw new AppError("No User with this id", 404)
+        throw new AppError("You are not yet registered", 404)
     }
 
   })

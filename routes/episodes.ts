@@ -29,6 +29,10 @@ router.route("/:id").patch(
     episodeController.UpdateEpisode
 )
 
+router.route("/:id").delete(
+    episodeController.DeleteEpisode
+)
+
 
 
 export {router as EpisodeRouter}

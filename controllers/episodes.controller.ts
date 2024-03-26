@@ -30,7 +30,9 @@ export class EpisodesController{
     })
 
     public DeleteEpisode= catchAsync(async(req:Request, res:Response)=>{
-        
+        const episode = await Episode.findByIdAndDelete(req.params.id)
+
+        sendSuccess(res, 200, "deleted succesfully")
     })
 
     public GetEpisode= catchAsync(async(req:Request, res:Response)=>{

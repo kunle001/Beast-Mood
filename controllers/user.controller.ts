@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import cloudinary from "cloudinary"
-import User from "../models/user.model";
+import User from "../models/user";
 import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";

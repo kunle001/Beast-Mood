@@ -7,7 +7,7 @@ import AppError from "../utils/appError";
 
 
 
-export class AnimieController{
+export class AnimieController {
 
     public GetAnimies = async(req:Request, res:Response)=>{
       try{

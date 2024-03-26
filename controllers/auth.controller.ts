@@ -26,7 +26,6 @@ class AuthController {
   
     if (user) {
       generateToken(user._id);
-      console.log(user)
       return sendSuccess(res, 201, user);
     } else {
       throw new AppError("The user already exists", 400);

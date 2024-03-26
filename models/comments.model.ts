@@ -44,7 +44,6 @@ const episodeCommentSchema = new Schema<IEpisodeComment>({
   },
 });
 
-
 const EpisodeComment = mongoose.model("EpisodeComment", episodeCommentSchema);
 const AnimieComment = mongoose.model("SeriesComment", animieCommentSchema);
 

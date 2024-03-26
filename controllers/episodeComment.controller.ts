@@ -28,7 +28,6 @@ export class CommentController{
     }
     
   }
-
   public GetOneEpisodeComment = catchAsync(async(req:Request, res:Response)=>{
     const comment = await EpisodeComment.findById(req.params.id)
     

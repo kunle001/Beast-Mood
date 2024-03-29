@@ -1,17 +1,29 @@
 import { Request, Response, response } from "express";
 import User from "../models/user.model";
-import Token from "../models/token.model";
+import UserOTPrecord from "../models/userOtpRecord.model";
 import { generateToken, clearToken } from "../utils/auth";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 import {catchAsync} from "../utils/catchAsync";
-import passLink from '../email_handler/resetPassword.template'
+import passLink from '../email_handler/resetPassword.template';
+import {sendOTPemail, }  from "../email_handler/otpEmailCalls";
 import {createTokenUser} from '../utils/createTokenUser';
 
 
 class AuthController {
   public Register = catchAsync(async(req: Request, res: Response) =>{
-    const { name, email, password } = req.body;
+    let { name, email, password } = req.body;
+    email = email?.trim();
+    password = password?.trim();
+
+    if (email == "") {
+      throw new AppError("Pls Enter Your Email", 401);
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      throw new AppError("Email is Invalid", 401);
+    } else if (password.length < 6) {
+      throw new AppError("Password should be at least 6 Characters", 401);
+    }
+
     const userExists = await User.findOne({ email });
   
     if (userExists) {
@@ -21,12 +33,13 @@ class AuthController {
     const user = await User.create({
       name,
       email,
-      password,
+      password
     });
   
     if (user) {
       generateToken(user._id);
-      return sendSuccess(res, 201, user);
+      // return sendSuccess(res, 201, user);
+      await sendOTPemail(user, UserOTPrecord,);
     } else {
       throw new AppError("The user already exists", 400);
     }

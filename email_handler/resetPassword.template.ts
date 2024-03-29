@@ -45,7 +45,7 @@ const passLink = async(user: {name: string; email: string; },  link: string,) =>
     console.log(error)
        console.log( 'Opps error occured')
     } else{
-        console.log('thanks for e-mailing me');
+        console.log('Check Your Email for OTP Code');
     }
    })
 }

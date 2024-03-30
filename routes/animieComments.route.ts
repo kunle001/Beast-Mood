@@ -1,14 +1,15 @@
 import express from "express"
-import { CommentController } from "../controllers/animiecomment.controller"
-
+import { AnimieCommentController } from "../controllers/animiecomment.controller"
+import { authenticate } from "../utils/auth"
 const router= express.Router()
-const commentController= new CommentController()
+const commentController= new AnimieCommentController()
 
-router.route("/createComment").post(commentController.Create)
+
+router.route("/createComment/:animieId").post(authenticate, commentController.Create)
 router.route("/getAllComment").get(commentController.GetComments)
-router.route("/:id/getOneComment").get(commentController.GetOneAnimieComment)
-router.route("/:id/updateComment").put(commentController.UpdateComment)
-router.route("/:id/deleteComment").delete(commentController.DeleteComment)
+router.route("/getOneComment/:id").get(commentController.GetOneAnimieComment)
+router.route("/updateComment/:id").put(commentController.UpdateComment)
+router.route("/deleteComment/:id").delete(commentController.DeleteComment)
 
 
 

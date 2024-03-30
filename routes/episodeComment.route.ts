@@ -1,13 +1,15 @@
 import express from "express"
 import { CommentController } from "../controllers/episodeComment.controller"
-
+import { authenticate } from "../utils/auth"
 const router= express.Router()
 const commentController= new CommentController()
 
-router.route("/createComment").post(commentController.Create)
+
+
+router.route("/createComment/:episodeId").post(authenticate,commentController.Create)
 router.route("/getComments").get(commentController.GetComments)
-router.route("/:id/editComment").put(commentController.UpdateComment)
-router.route("/:id/deleteComment").delete(commentController.DeleteComment)
+router.route("/editComment/:id").put(commentController.UpdateComment)
+router.route("/deleteComment/:id").delete(commentController.DeleteComment)
 
 
 

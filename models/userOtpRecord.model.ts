@@ -1,28 +1,18 @@
-import mongoose, {Types, ObjectId, Document, Schema } from "mongoose";
+import mongoose, {Types, Document, Schema } from "mongoose";
 
 export interface IOTP extends Document {
-  userId: Types.ObjectId;
+  userId:string;
   hashedOTP: string;
   createdAt: Date;
   expiresAt: Date
 }
 
-const userOTPSchema = new mongoose.Schema<IOTP>({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "User",
-  },
-  hashedOTP: {
-    types: String
-  },
-  createdAt: {
-    type: Date,
-  },
-  expiresAt: {
-    type: Date,
-  },
+const userOTPSchema = new Schema<IOTP>({
+  userId:String,
+  hashedOTP: String,
+  createdAt: Date,
+  expiresAt:Date,
 });
-const UserOTPrecord = mongoose.model("UserOTPrecord", userOTPSchema);
+const UserOTPRecord = mongoose.model("UserOTPRecord", userOTPSchema);
 
-export default UserOTPrecord;
+export default UserOTPRecord;

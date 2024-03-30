@@ -27,7 +27,7 @@ const emailHeader = (title: string)=>{
                     <tr>
                         <td style="text-align:center;">
                             <a href="https://made-n-nigeria.com" title="logo" target="_blank">
-                            <img width="150px" src="${process.env.BASEURL}/img/pro-logo.png" title="logo" alt="logo">
+                            <img width="150px" src="${process.env.CLIENT_URL}/img/pro-logo.png" title="logo" alt="logo">
                           </a>
                         </td>
                     </tr>

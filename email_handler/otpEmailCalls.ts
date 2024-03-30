@@ -1,13 +1,9 @@
 import {otpEmailTemplate, WelcomeEmailTemplate}  from '../email_handler/emailTemplates'
 import bcrypt from "bcryptjs";
 import sendEmail from "./sendEmail"
-import { Document, Types, Model, Schema, DefaultSchemaOptions, FlatRecord } from 'mongoose';
-import { IUser } from '../models/user.model';
-import { IOTP } from '../models/userOtpRecord.model';
-
 
   // Send OTP Email and Save New OTP in Database
-  const sendOTPemail = async (user: Document<unknown, {}, IUser> & IUser & { _id: Types.ObjectId; }, OTPModel: Model<IOTP, {}, {}, {}, Document<unknown, {}, IOTP> & IOTP & { _id: Types.ObjectId; }, Schema<IOTP, Model<IOTP, any, any, any, Document<unknown, any, IOTP> & IOTP & { _id: Types.ObjectId; }, any>, {}, {}, {}, {}, DefaultSchemaOptions, IOTP, Document<unknown, {}, FlatRecord<IOTP>> & FlatRecord<IOTP> & { _id: Types.ObjectId; }>>) => {
+  const sendOTPemail = async(user: { email: string; _id: string; }, OTPModel: { create: (arg0: { userId: string; hashedOTP: string; createdAt: number; expiresAt: number; }) => void; } ) => {
       // destruction userId and user email from sentOTPemail Function
       const transporter = sendEmail();
 
@@ -17,7 +13,7 @@ import { IOTP } from '../models/userOtpRecord.model';
 
       // email sending options
       const mailOptions = {
-        from: process.env.EMAIL_USERNAME,
+        from:`"OTP Verification"${process.env.EMAIL_USERNAME}`,
         to: user.email,
         subject: "Verify Your Email",
         html: otpEmailTemplate(otp, "15 Minutes"),
@@ -25,38 +21,37 @@ import { IOTP } from '../models/userOtpRecord.model';
 
       //  hash otp and send to user email
       const hashedOTP = await bcrypt.hash(otp, 10);
-       OTPModel.create({
-        userId: user.id,
+      await OTPModel.create({
+        userId: user._id,
         hashedOTP,
         createdAt: Date.now(),
         expiresAt: Date.now() + 900000, // Expire in 15 minutes (Add 900,000 Milliseconds to the current Timestamp)
       });
 
-      transporter.sendMail(mailOptions, (error, result) => {
+      await transporter.sendMail(mailOptions, (error, _result) => {
         if (error){
         console.log(error)
-           console.log( "Internal Server Error")
+            console.log( "Internal Server Error Email connection!!")
         } else{
             console.log('Check Your Email for OTP Code');
         }
-       })
+      })
   }
-  
-  const RegisterSuccessEmail = async (user: { email: string; }) => {
-  //   try {
-  //     const mailOptions = {
-  //       from: '"New Registration"<support@cheapay.com.ng>',
-  //       to: `${user.email}, ernestez12@gmail.com`,
-  //       subject: "New User Welcome Email",
-  //       html: WelcomeEmailTemplate(),
-  //     };
 
-  //     await transporter.sendMail(mailOptions);
-  //   } catch (err) {
-  //     logger.error(err);
-  //     res.status(500).json({ err: "Internal Server Error" });
-  //   }
-  // },
+  const RegisterSuccessEmail = async (user: { email: string;}) => {
+    const transporter = sendEmail();
+    try {
+      const mailOptions = {
+        from: `"New Registration"${process.env.EMAIL_USERNAME}`,
+        to: `${user.email}, aninmie@gmail.com`,
+        subject: "New User Welcome Email",
+        html: WelcomeEmailTemplate(),
+      };
+
+      await transporter.sendMail(mailOptions);
+    } catch (err) {
+      console.log({ err: "Internal Server Error Email connection!!" });
+    }
   }
 
   export {sendOTPemail, RegisterSuccessEmail};

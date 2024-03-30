@@ -65,10 +65,9 @@ export default (err: any, req: Request, res: Response, next: NextFunction) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
-    console.log(process.env.MODE)
     if (process.env.MODE === 'development') {
         sendErrorDev(err, res);
-    } else if (process.env.NODE === 'production') {
+    } else if (process.env.MODE === 'production') {
         let error: AppError;
 
         if (err.code === 11000) {

@@ -1,4 +1,4 @@
-import express from 'express'
+import express from "express"
 import { AnimieRouter } from "./routes/animie.route"
 import UserRouter from "./routes/user.route"
 import { AnimieCommentRouter } from "./routes/animieComments.route"
@@ -11,13 +11,11 @@ import errorHandlerController from "./controllers/errorHandler.controller"
 import AppError from "./utils/appError"
 import { sendSuccess } from "./utils/response"
 import { EpisodeRouter } from "./routes/episodes"
-
 // Register Routes
 
 const app= express()
 
 app.use(bodyParser.json())
-// app.use(mongoSanitize)
 // app.use(mongoSanitize())
 
 interface UserBasicInfo {

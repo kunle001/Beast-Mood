@@ -1,7 +1,4 @@
-const {sendEmail} = require("./sendEmail")
-
-
-
+import sendEmail from "./sendEmail";
 
 const sendVerificationMail = async (user: { generateVerificationToken: () => any; email: string; name: string; id: string; }) => {
     const transporter = sendEmail();
@@ -47,7 +44,7 @@ const sendVerificationMail = async (user: { generateVerificationToken: () => any
         </body>`
     };
     
-    transporter.sendMail(mailOptions, (error: string, result: string) => {
+    transporter.sendMail(mailOptions, (error, result) => {
         if (error){
         console.log(error)
            console.log( 'Opps error occured')

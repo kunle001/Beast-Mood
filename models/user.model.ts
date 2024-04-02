@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  verifiedEmail:boolean,
   comparePassword: (enteredPassword: string) => boolean;
   resetToken:string;
 }
@@ -16,7 +17,6 @@ const userSchema = new Schema<IUser>({
   },
   email: {
     type: String,
-    required: true,
     unique: true,
   },
   password: {
@@ -25,6 +25,10 @@ const userSchema = new Schema<IUser>({
   },
   resetToken: {
     type: String,
+  },
+  verifiedEmail: {
+    type: Boolean, 
+    default: false 
   },
 });
 

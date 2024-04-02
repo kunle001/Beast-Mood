@@ -10,7 +10,7 @@ console.log(process.env.MODE)
 
 const start = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI!, {
+        await mongoose.connect(process.env.DB!, {
             // useNewUrlParser: true,
             // useUnifiedTopology: true,
         } as ConnectOptions);

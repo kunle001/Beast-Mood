@@ -8,14 +8,31 @@ import AppError from "../utils/appError";
 export class CommentController{
   public Create = catchAsync(async(req:Request, res:Response)=>{
 
-    const comment = new EpisodeComment( req.body);
+    const { message } = req.body;
+    const episodeId = req.params.episodeId;
+    const existingUser = req.user?._id
 
-    if(req.body.userId){
-        await comment.save();
-        sendSuccess(res, 201, comment)
-    }else{
-        throw new AppError("No User with this id", 404)
+    // validate of input
+    if (!message) {
+      return res.status(403).send({
+        success: false,
+        message: "Input are required",
+      });
     }
+
+    const comment = new EpisodeComment({
+      message,
+      userId: existingUser,
+      episodeId,
+    })
+
+    await comment.save();
+
+    sendSuccess(res, 201 ,{
+      message: "comment created successfully",
+      success: true,
+      comment
+    })
   })
 
   public GetComments = async(req:Request, res:Response)=>{
@@ -28,12 +45,11 @@ export class CommentController{
     }
     
   }
-
   public GetOneEpisodeComment = catchAsync(async(req:Request, res:Response)=>{
     const comment = await EpisodeComment.findById(req.params.id)
     
     if (!comment){
-      throw new AppError("no animie with this Id", 404)
+      throw new AppError("no comment with this Id", 404)
     }
 
     sendSuccess(res,200,comment)

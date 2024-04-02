@@ -1,23 +1,38 @@
 import { Request, Response } from "express";
-import { AnimieComment } from "../models/comments.model";
+import {AnimieComment}  from "../models/comments.model";
 import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 
 
-export class CommentController{
+export class AnimieCommentController{
   public Create = catchAsync(async(req:Request, res:Response)=>{
 
-    const { message, animieId } = req.body;
+    const { message } = req.body;
+    const animieId = req.params.animieId;
+    const existingUser = req.user?._id
 
-    if(req.body.userId){
-      const comment = new AnimieComment({message, animieId });
-      await comment.save();
-      sendSuccess(res, 201, comment)
-    }else{
-        throw new AppError("You are not yet registered", 404)
+    // validate of input
+    if (!message) {
+      return res.status(403).send({
+        success: false,
+        message: "Input are required",
+      });
     }
+  
+    const comment = new AnimieComment({
+      message,
+      userId: existingUser,
+      animieId,
+    });
 
+    await comment.save();
+
+    sendSuccess(res, 201, {
+      message: "comment created successfully",
+      success: true,
+      comment
+    })
   })
 
   public GetOneAnimieComment = catchAsync(async(req:Request, res:Response)=>{

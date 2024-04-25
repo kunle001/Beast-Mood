@@ -2,15 +2,22 @@ import 'express-async-errors';
 import { ConnectOptions } from 'mongoose'
 import mongoose from "mongoose";
 import { app } from './app';
-import dotenv from 'dotenv'
+import dotenv from "dotenv"
+import cloudinary from "cloudinary" 
 
-dotenv.config({path: './.env'})
-console.log(process.env.MODE)
+dotenv.config({ path: './.env' });
+// configurer cloudinary
+cloudinary.v2.config({
+    cloud_name: 'dx8obnscc',
+    api_key: '568434899362299',
+    api_secret: 'eQNZbRpMwAMQVbHNHKatckaGMcQ',
+    secure: true,
+  });
 
 
 const start = async () => {
     try {
-        await mongoose.connect(process.env.DB!, {
+        await mongoose.connect(process.env.DB_URL!, {
             // useNewUrlParser: true,
             // useUnifiedTopology: true,
         } as ConnectOptions);

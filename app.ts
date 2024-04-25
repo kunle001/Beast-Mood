@@ -38,9 +38,8 @@ app.use("/api/v1/episode", EpisodeRouter)
 app.use("/api/v1/animieComment", AnimieCommentRouter)
 app.use("/api/v1/episodeComment", EpisodeCommentRouter)
 
-app.use("/api/v1/.animie", AnimieRouter)
-app.use("/api/v1/.user", UserRouter)
-app.use("/api/v1/.auth", AuthRouter)
+app.use("/api/v1/user", UserRouter)
+app.use("/api/v1/auth", AuthRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Page ${req.originalUrl} is not found`, 404));

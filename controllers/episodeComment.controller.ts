@@ -81,7 +81,7 @@ export class CommentController{
 
     if(comment.userId == req.body.userId){
         await EpisodeComment.updateOne(
-            {$set: req.body},
+          {$set: req.body},
         )
     }else {
         throw new AppError("sorry you cant perform this!", 400)

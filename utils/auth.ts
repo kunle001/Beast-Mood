@@ -23,7 +23,7 @@ const authenticate = catchAsync(async(req: Request, res: Response, next: NextFun
 
     if (!token) {
       res.status(401);
-      throw new AppError('You are not login, please log in', 401);
+      throw new AppError('You are not Logged In', 401);
     }
 
     const jwtSecret = process.env.JWT_SECRET || "";
@@ -43,7 +43,6 @@ const authenticate = catchAsync(async(req: Request, res: Response, next: NextFun
 
   next();
 });
-
 
 const clearToken = (res: Response) => {
   res.cookie("jwt", "", {

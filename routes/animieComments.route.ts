@@ -8,8 +8,8 @@ const commentController= new AnimieCommentController()
 router.route("/createComment/:animieId").post(authenticate, commentController.Create)
 router.route("/getAllComment").get(commentController.GetComments)
 router.route("/getOneComment/:id").get(commentController.GetOneAnimieComment)
-router.route("/updateComment/:id").put(commentController.UpdateComment)
-router.route("/deleteComment/:id").delete(commentController.DeleteComment)
+router.route("/updateComment/:id").put(authenticate, commentController.UpdateComment)
+router.route("/deleteComment/:id").delete(authenticate, commentController.DeleteComment)
 
 
 

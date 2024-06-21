@@ -22,9 +22,6 @@ const animieCommentSchema = new Schema<IAnimieComment>({
   },
 });
 
-const AnimieComment = mongoose.model("AnimieComment", animieCommentSchema);
-
-
 
 //Episode Comment schema
 export interface IEpisodeComment extends Document {
@@ -48,6 +45,8 @@ const episodeCommentSchema = new Schema<IEpisodeComment>({
   },
 });
 
+
+const AnimieComment = mongoose.model("AnimieComment", animieCommentSchema);
 const EpisodeComment = mongoose.model("EpisodeComment", episodeCommentSchema);
 
 export {AnimieComment,EpisodeComment };

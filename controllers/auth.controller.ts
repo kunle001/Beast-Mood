@@ -56,7 +56,6 @@ class AuthController {
       otp = otp.trim();
 
       // validate input.
-
       if (!otp) {
         throw new AppError("Please provide OTP to proceed", 403);
       } else if (!userId) {
@@ -101,6 +100,42 @@ class AuthController {
           }
         }
       }
+  });
+
+  public resendotp = catchAsync(async(req: Request, res: Response) => {
+    let { email } = req.body;
+    email = email?.trim();
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser!.verifiedEmail) {
+      return res.status(403).json({ err: "You don't have need for new OTP" });
+    }
+
+    if (!email) {
+      throw new AppError("Please Enter Your Email", 401)
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      throw new AppError("Email is Invalid", 401);
+    } else if (!existingUser) {
+      throw new AppError("This account doesn't exist", 400);
+    } else {
+      //  Check if user has a valid OTP Previously to avaoid multiple requests
+      const existingValidOTP = await UserOTPRecord.findOne({
+        userId: existingUser.id,
+        expiresAt: { $gte: Date.now() },
+      });
+
+      if (existingValidOTP)
+        throw new AppError("Your previous OTP is still Valid, Use it", 400);
+
+      // Delete Expired OTP and Send a New One
+      await UserOTPRecord.deleteOne({ userId: existingUser.id });
+
+      //  Call the OTP Email sending function and also create new OTP record
+      await sendOTPemail(existingUser, UserOTPRecord);
+
+      return sendSuccess(res, 201, {message:"Check your email for a verification otp!"})
+    }
   });
 
   public Login = catchAsync(async(req: Request, res: Response) => {
@@ -176,7 +211,6 @@ class AuthController {
     clearToken(res);
     return sendSuccess(res, 200, "User logged out");
   };
-
 }
 
 export default AuthController;

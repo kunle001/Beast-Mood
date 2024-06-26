@@ -1,16 +1,24 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { Roles } from "../utils/constant";
 
 export interface IUser extends Document {
+  googleId:string,
   name: string;
   email: string;
+  first_name: string;
+  last_name: string;
   password: string;
+  profilePic:string;
   verifiedEmail:boolean,
+  roles:string[];
   comparePassword: (enteredPassword: string) => boolean;
   resetToken:string;
+  _doc?:any
 }
 
 const userSchema = new Schema<IUser>({
+  googleId: String,
   name: {
     type: String,
     required: true,
@@ -19,16 +27,24 @@ const userSchema = new Schema<IUser>({
     type: String,
     unique: true,
   },
+  first_name: String,
+  last_name: String,
   password: {
     type: String,
     required: true,
   },
+  profilePic: { type: String },
   resetToken: {
     type: String,
   },
   verifiedEmail: {
     type: Boolean, 
     default: false 
+  },
+  roles: {
+    type: [String],
+    required: true,
+    default: [Roles.User],
   },
 });
 

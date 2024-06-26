@@ -7,14 +7,14 @@ import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 import {catchAsync} from "../utils/catchAsync";
 import passLink from '../email_handler/resetPassword.template';
-import {sendOTPemail, RegisterSuccessEmail }  from "../email_handler/otpEmailCalls";
+import {sendOTPemail }  from "../email_handler/otpEmailCalls";
 import {createTokenUser} from '../utils/createTokenUser';
 import UserOTPRecord from "../models/userOtpRecord.model";
 
 
 class AuthController {
   public Register = catchAsync(async(req: Request, res: Response) =>{
-    let { name, email, password } = req.body;
+    let { name, email, password, profilePic } = req.body;
     email = email?.trim();
     password = password?.trim();
 
@@ -35,11 +35,12 @@ class AuthController {
     const user = await User.create({
       name,
       email,
+      profilePic,
       password
     });
   
     if (user) {
-     await generateToken(user._id);
+        generateToken(user._id, user.roles, user.email);
 
       // Send OTP email for user to Verify his email and also create new OTP Record in DB
       await sendOTPemail(user,  UserOTPRecord);
@@ -95,7 +96,7 @@ class AuthController {
               // send successfull registration email to client and Admin
               // await RegisterSuccessEmail(user);
 
-              return sendSuccess(res, 201, { message: "Account Verification successfull"});
+              return sendSuccess(res, 200, { message: "Account Verification successfull"});
             }
           }
         }
@@ -134,23 +135,25 @@ class AuthController {
       //  Call the OTP Email sending function and also create new OTP record
       await sendOTPemail(existingUser, UserOTPRecord);
 
-      return sendSuccess(res, 201, {message:"Check your email for a verification otp!"})
+      return sendSuccess(res, 200, {message:"Check your email for a verification otp!"})
     }
   });
 
   public Login = catchAsync(async(req: Request, res: Response) => {
 
-    const {email, password, verifiedEmail} = req.body;
+    const {email, password} = req.body;
     const user = await User.findOne({email})
 
     if(user && (user.verifiedEmail == false)) {
       throw new AppError("Unverified account", 403)
     };
 
-    if(user && (await user.comparePassword(password))){
-      const token = await generateToken(user._id)
+    if(user && (user.comparePassword(password))){
+      const token = generateToken(user._id, user.roles, email)
       return sendSuccess(res, 200, {
-        user, 
+        id: user._id,
+        name: user.name,
+        email: user.email,
         token: token
       });
     }
@@ -170,7 +173,7 @@ class AuthController {
       //Generate and set password reset token
       const getToken = createTokenUser(user);
       
-      user.resetToken = generateToken(getToken.userId);
+      user.resetToken = generateToken(getToken.userId, user.roles, email);
       await user.save();
 
       const link = `${process.env.CLIENT_URL}/reset-password/${user.resetToken}`;

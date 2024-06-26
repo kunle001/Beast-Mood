@@ -42,19 +42,23 @@ export class UserController{
      public UpdateUser = catchAsync(async(req:Request, res:Response)=>{
       if(req.body.password) req.body.password = cryptoJs.AES.encrypt(req.body.password, process.env.JWT_SECRET!).toString();
 
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      const user = await User.findByIdAndUpdate(req.params.id,
+        {
+          $set: req.body,
+        },
+        {
         new: true, 
         runValidators: true
       }).select(
         ["-password"])
 
-      sendSuccess(res, 201, user)
+      sendSuccess(res, 200, user)
     })
 
     public DeleteUser = catchAsync(async(req:Request, res:Response)=>{
       await User.findByIdAndDelete(req.params.id)
 
-      sendSuccess(res, 201, "User deleted successfully")
+      sendSuccess(res, 200, "User deleted successfully")
     })
 
 }

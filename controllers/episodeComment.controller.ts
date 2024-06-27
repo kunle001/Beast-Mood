@@ -3,6 +3,7 @@ import { EpisodeComment } from "../models/comments.model";
 import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
+import { Episode } from "../models/episodes.model.";
 
 
 export class CommentController{
@@ -11,6 +12,12 @@ export class CommentController{
     const { message } = req.body;
     const episodeId = req.params.episodeId;
     const existingUser = req.user?._id
+
+    const isAnimeExist = await Episode.findById(episodeId)
+    
+    if (!isAnimeExist){
+      throw new AppError("Episode does not exist", 404)
+    }
 
     // validate of input
     if (!message) {
@@ -88,5 +95,33 @@ export class CommentController{
     }
 
     sendSuccess(res, 200, comment)
+  })
+
+  public ReplyComment = catchAsync(async(req:Request, res:Response)=>{
+  
+    const {commentId, episodeId} = req.params;
+    const {message} = req.body;
+    const existingUser = req.user?._id;
+
+    // validate of input
+    if (!message) {
+      throw new AppError("Reply can't be enpty", 404)
+    }
+    const replyObj = {
+      userId:existingUser,
+      episodeId,
+      message,
+      parentComment:commentId
+    }
+
+    const newReply = await new EpisodeComment(replyObj).save();
+    const allReply = await EpisodeComment.findOneAndUpdate({_id:commentId, episodeId}, {$push:{replies:newReply._id}}).populate({
+      path: 'parentComment',
+      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
+    }).exec();;
+
+
+    sendSuccess(res, 200, allReply)
+    
   })
 };

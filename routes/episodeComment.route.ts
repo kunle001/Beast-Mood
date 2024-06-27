@@ -10,7 +10,7 @@ router.route("/createComment/:episodeId").post(authenticate,commentController.Cr
 router.route("/getComments").get(commentController.GetComments)
 router.route("/editComment/:id").put(authenticate, commentController.UpdateComment)
 router.route("/deleteComment/:id").delete(authenticate, commentController.DeleteComment)
-
+router.route("/replyComment/:commentId/reply/:episodeId").post(authenticate, commentController.ReplyComment)
 
 
 export {router as EpisodeCommentRouter}

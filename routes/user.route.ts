@@ -11,7 +11,7 @@ const userController = new UserController()
 UserRouter.get('/', userController.GetUsers);
 UserRouter.get('/:id', userController.GetOneUser)
 UserRouter.put('/:id', authenticate, authorizedUser([Roles.Admin, Roles.User]), userController.UpdateUser)
-UserRouter.delete('/:id',authenticate, authorizedUser, userController.DeleteUser)
+UserRouter.delete('/:id',authenticate, authorizedUser([Roles.Admin, Roles.User]), userController.DeleteUser)
 
 
 export default UserRouter;

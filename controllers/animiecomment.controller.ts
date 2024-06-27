@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {AnimieComment}  from "../models/comments.model";
+import { Animie } from "../models/animies.model";
 import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
@@ -11,6 +12,12 @@ export class AnimieCommentController{
     const { message } = req.body;
     const animieId = req.params.animieId;
     const existingUser = req.user?._id
+
+    const isAnimeExist = await Animie.findById(animieId)
+    
+    if (!isAnimeExist){
+      throw new AppError("Anime does not exist", 404)
+    }
 
     // validate of input
     if (!message) {
@@ -92,4 +99,29 @@ export class AnimieCommentController{
     sendSuccess(res, 200, comment)
   })
 
+  public ReplyComment = catchAsync(async(req:Request, res:Response)=>{
+
+    const {commentId, animieId} = req.params;
+    const {message} = req.body;
+    const existingUser = req.user?._id;
+
+    // validate of input
+    if (!message) {
+      throw new AppError("Reply can't be enpty", 404)
+    }
+    const replyObj = {
+      userId:existingUser,
+      animieId,
+      message,
+      parentComment:commentId
+    }
+
+    const newReply = await new AnimieComment(replyObj).save();
+    const result = await AnimieComment.findOneAndUpdate({_id:commentId, animieId}, {$push:{replies:newReply._id}}).populate({
+      path: 'parentComment',
+      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
+    }).exec();;
+
+    sendSuccess(res, 200, result)
+  })
 };

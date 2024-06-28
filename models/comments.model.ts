@@ -1,5 +1,5 @@
 import mongoose, {Types, ObjectId, Document, Schema } from "mongoose";
-import Populate from "../utils/autopopulate"
+
 
 //Animie Comment schema
 export interface IAnimieComment extends Document {
@@ -8,6 +8,7 @@ export interface IAnimieComment extends Document {
   message: string;
   parentComment:Types.ObjectId;
   replies:Types.ObjectId;
+  likes:Types.ObjectId[];
 }
 
 const animieCommentSchema = new Schema<IAnimieComment>({
@@ -24,23 +25,24 @@ const animieCommentSchema = new Schema<IAnimieComment>({
     required:[true, "Comment must not be empty!"],
   },
   parentComment:{
-    type:Schema.Types.ObjectId,
+    type:mongoose.Schema.Types.ObjectId,
     ref:"AnimieComment",
     default:null
   },
   replies: [
     { 
-    type: Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'AnimieComment' 
     }
   ],
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Assuming 'User' is the model name for users
 },
  { timestamps: true },
 );
 // Always populate the userId field
-animieCommentSchema.pre("find", function( next){
+animieCommentSchema.pre("findOne", function( next){
   this.populate({path:"replies",
-populate:{path:"userId"}
+  // populate:{path:"userId", select:"name profilePic email -password -verifiedEmail -roles"}
 })
   next()
 })
@@ -53,6 +55,7 @@ export interface IEpisodeComment extends Document {
   message: string;
   parentComment:Types.ObjectId;
   replies:Types.ObjectId;
+  likes:Types.ObjectId[];
 }
 
 const episodeCommentSchema = new Schema<IEpisodeComment>({
@@ -69,22 +72,23 @@ const episodeCommentSchema = new Schema<IEpisodeComment>({
     required:[true, "Comment must not be empty!"],
   },
   parentComment:{
-    type:Schema.Types.ObjectId,
+    type:mongoose.Schema.Types.ObjectId,
     ref:"EpisodeComment",
     default:null
   },
-  replies: [{ type: Schema.Types.ObjectId, ref: 'EpisodeComment' }],
+  replies: [{ type:mongoose.Schema.Types.ObjectId, ref: 'EpisodeComment' }],
+  likes: [{ type:mongoose.Schema.Types.ObjectId, ref: 'User' }] // Assuming 'User' is the model name for users
 },
 { timestamps: true },
 );
 
 // Always populate the userId field
-episodeCommentSchema.pre("find", function( next){
-  this.populate({path:"replies",
-  populate:{path:"userId"}
-})
-  next()
-})
+// episodeCommentSchema.pre("findOne", function( next){
+//   this.populate({path:"replies",
+//     // populate:{path:"userId", select:"name profilePic email -password -verifiedEmail -roles"}  
+// })
+//   next()
+// })
 
 
 

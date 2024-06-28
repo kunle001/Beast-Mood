@@ -4,7 +4,7 @@ import { Animie } from "../models/animies.model";
 import {catchAsync} from "../utils/catchAsync";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
-
+import mongoose from 'mongoose';
 
 export class AnimieCommentController{
   public Create = catchAsync(async(req:Request, res:Response)=>{
@@ -43,7 +43,24 @@ export class AnimieCommentController{
   })
 
   public GetOneAnimieComment = catchAsync(async(req:Request, res:Response)=>{
-    const comment = await AnimieComment.findById(req.params.id)
+    const comment = await AnimieComment.findById(req.params.id).populate([
+      {
+        path:"userId",
+        model: "User",
+        select:"name profilePic"},
+
+      {
+        path: 'parentComment'
+      },
+      {
+        path: 'parentComment', 
+        populate: { path: 'parentComment', /* continue as deep as necessary */ 
+
+      }
+        
+      },
+      
+    ]).sort({_id:1}).exec();
     
     if (!comment){
       throw new AppError("no animie with this Id", 404)
@@ -64,15 +81,16 @@ export class AnimieCommentController{
   }
 
   public DeleteComment = catchAsync(async(req:Request, res:Response)=>{
-
-    const comment= await AnimieComment.findById(req.params.id)
+    const {commentId, animieId} = req.params;
+    const comment= await AnimieComment.findOne({_id:commentId, animieId}).lean();
 
     if (!comment){
       throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment.userId == req.body.userId){
-      await comment.deleteOne();
+    if(comment && comment.userId === req.body.userId){
+      await AnimieComment.deleteMany({_id:{$in:comment.replies}})
+      await AnimieComment.deleteOne();
     } else {
       throw new AppError("sorry you cant perform this!", 400)
     }
@@ -88,7 +106,7 @@ export class AnimieCommentController{
         throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment.userId == req.body.userId){
+    if(comment && comment.userId == req.body.userId){
         await AnimieComment.updateOne(
             {$set: req.body},
         )
@@ -117,11 +135,62 @@ export class AnimieCommentController{
     }
 
     const newReply = await new AnimieComment(replyObj).save();
-    const result = await AnimieComment.findOneAndUpdate({_id:commentId, animieId}, {$push:{replies:newReply._id}}).populate({
-      path: 'parentComment',
-      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
-    }).exec();;
+    const result = await AnimieComment.findOneAndUpdate({_id:commentId, animieId}, {$push:{replies:newReply._id}});
 
     sendSuccess(res, 200, result)
+  })
+
+  // public toggleLike = catchAsync(async(req:Request, res:Response)=>{
+  //   const {commentId} = req.params;
+  //   const userId = req.user?._id; // Assuming req.user contains user information
+
+  //   const comment = await AnimieComment.findById(commentId);
+
+  //   if (!comment){
+  //     throw new AppError("Comment not found", 404)
+  //   }
+  //  //Lets Check if the user has already liked the particular ecomment
+  //   const isLiked = comment.likes.some(like => like.equals(userId)); // Check if userId is already in likes array;
+
+  //   if(isLiked){
+  //     // User has already liked the comment, unlike it
+  //     comment.likes = comment.likes.filter(like => !like.equals(userId))
+  //   }else{
+  //     // If the User hasn't liked the comment, like it
+  //     comment.likes.push((userId)); //this line was given error
+      
+  //   }
+
+  //   await comment.save();
+
+  //   sendSuccess(res, 200, "Comment Liked/Unliked")
+  // })
+
+  public likeComment = catchAsync(async(req:Request, res:Response)=>{
+    const {commentId} = req.params;
+    const userId = req.user?._id;
+
+    const comment = await AnimieComment.findByIdAndUpdate(
+      {_id:commentId},
+      // Add userId to likes array if not already present
+      { $addToSet: { likes: userId } },
+      { new: true }
+  );
+
+    sendSuccess(res, 200, comment, "Comment Unliked")
+  })
+
+  public unlikeComment = catchAsync(async(req:Request, res:Response)=>{
+    const {commentId} = req.params;
+    const userId = req.user?._id;
+
+    const comment = await AnimieComment.findByIdAndUpdate(
+      {_id:commentId},
+       // Remove userId from likes array
+      { $pull: { likes: userId } },
+      { new: true }
+  );
+
+    sendSuccess(res, 200, comment, "Comment Unliked")
   })
 };

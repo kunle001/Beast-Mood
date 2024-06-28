@@ -53,7 +53,10 @@ export class CommentController{
     
   }
   public GetOneEpisodeComment = catchAsync(async(req:Request, res:Response)=>{
-    const comment = await EpisodeComment.findById(req.params.id)
+    const comment = await EpisodeComment.findById(req.params.id).populate({
+      path: 'parentComment',
+      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
+    }).sort({_id:1}).exec();
     
     if (!comment){
       throw new AppError("no comment with this Id", 404)
@@ -115,13 +118,36 @@ export class CommentController{
     }
 
     const newReply = await new EpisodeComment(replyObj).save();
-    const allReply = await EpisodeComment.findOneAndUpdate({_id:commentId, episodeId}, {$push:{replies:newReply._id}}).populate({
-      path: 'parentComment',
-      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
-    }).exec();;
-
+    const allReply = await EpisodeComment.findOneAndUpdate({_id:commentId, episodeId}, {$push:{replies:newReply._id}});
 
     sendSuccess(res, 200, allReply)
-    
+  })
+
+  public likeComment = catchAsync(async(req:Request, res:Response)=>{
+    const {commentId} = req.params;
+    const userId = req.user?._id;
+
+    const comment = await EpisodeComment.findByIdAndUpdate(
+      commentId,
+      // Add userId to likes array if not already present
+      { $addToSet: { likes: userId } },
+      { new: true }
+  );
+
+    sendSuccess(res, 200, comment, "Comment Unliked")
+  })
+
+  public unlikeComment = catchAsync(async(req:Request, res:Response)=>{
+    const {commentId} = req.params;
+    const userId = req.user?._id;
+
+    const comment = await EpisodeComment.findByIdAndUpdate(
+      commentId,
+       // Remove userId from likes array
+      { $pull: { likes: userId } },
+      { new: true }
+  );
+
+    sendSuccess(res, 200, comment, "Comment Unliked")
   })
 };

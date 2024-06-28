@@ -11,6 +11,7 @@ router.route("/getComments").get(commentController.GetComments)
 router.route("/editComment/:id").put(authenticate, commentController.UpdateComment)
 router.route("/deleteComment/:id").delete(authenticate, commentController.DeleteComment)
 router.route("/replyComment/:commentId/reply/:episodeId").post(authenticate, commentController.ReplyComment)
-
+router.route("/like/:commentId").post(authenticate, commentController.likeComment)
+router.route("/unlike/:commentId").post(authenticate, commentController.unlikeComment)
 
 export {router as EpisodeCommentRouter}

@@ -98,13 +98,14 @@ export class AnimieCommentController{
   })
 
   public UpdateComment = catchAsync(async(req:Request, res:Response)=>{
+    const userId = req.user?._id
     const comment = await AnimieComment.findById(req.params.id)
 
     if (!comment){
         throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment && comment.userId == req.body.userId){
+    if(comment && comment.userId.toString() == userId){
         await AnimieComment.updateOne(
             {$set: req.body},
         )

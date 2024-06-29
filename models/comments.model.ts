@@ -8,7 +8,7 @@ export interface IAnimieComment extends Document {
   message: string;
   parentComment:Types.ObjectId;
   replies:Types.ObjectId;
-  likes:Types.ObjectId[];
+  likes:string[];
 }
 
 const animieCommentSchema = new Schema<IAnimieComment>({
@@ -42,7 +42,6 @@ const animieCommentSchema = new Schema<IAnimieComment>({
 // Always populate the userId field
 animieCommentSchema.pre("findOne", function( next){
   this.populate({path:"replies",
-  // populate:{path:"userId", select:"name profilePic email -password -verifiedEmail -roles"}
 })
   next()
 })
@@ -55,7 +54,7 @@ export interface IEpisodeComment extends Document {
   message: string;
   parentComment:Types.ObjectId;
   replies:Types.ObjectId;
-  likes:Types.ObjectId[];
+  likes:string[];
 }
 
 const episodeCommentSchema = new Schema<IEpisodeComment>({
@@ -83,12 +82,11 @@ const episodeCommentSchema = new Schema<IEpisodeComment>({
 );
 
 // Always populate the userId field
-// episodeCommentSchema.pre("findOne", function( next){
-//   this.populate({path:"replies",
-//     // populate:{path:"userId", select:"name profilePic email -password -verifiedEmail -roles"}  
-// })
-//   next()
-// })
+episodeCommentSchema.pre("findOne", function( next){
+  this.populate({path:"replies",
+})
+  next()
+})
 
 
 

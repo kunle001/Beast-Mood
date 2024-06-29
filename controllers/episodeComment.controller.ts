@@ -53,10 +53,21 @@ export class CommentController{
     
   }
   public GetOneEpisodeComment = catchAsync(async(req:Request, res:Response)=>{
-    const comment = await EpisodeComment.findById(req.params.id).populate({
-      path: 'parentComment',
-      populate: { path: 'parentComment', populate: { path: 'parentComment', /* continue as deep as necessary */ } }
-    }).sort({_id:1}).exec();
+    const comment = await EpisodeComment.findById(req.params.id).populate([
+      {
+        path:"userId",
+        model: "User",
+        select:"name profilePic"},
+
+      {
+        path: 'parentComment'
+      },
+      {
+        path: 'parentComment', 
+        populate: { path: 'parentComment', /* continue as deep as necessary */ 
+      }
+      },
+    ]).sort({_id:1}).exec()
     
     if (!comment){
       throw new AppError("no comment with this Id", 404)
@@ -66,30 +77,34 @@ export class CommentController{
   })
 
   public DeleteComment = catchAsync(async(req:Request, res:Response)=>{
-
-    const comment = await EpisodeComment.findById(req.params.id)
+    const {commentId, animieId} = req.params;
+    const userId = req.user?._id
+    const comment= await EpisodeComment.findById({_id:commentId, animieId}).lean();
 
     if (!comment){
       throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment.userId == req.body.userId){
-      await comment.deleteOne();
+    if(comment && comment.userId.toString() == userId){
+        await EpisodeComment.deleteMany({_id:{$in:comment.replies}})
+          await EpisodeComment.deleteOne({_id:commentId});
     } else {
-      throw new AppError("sorry you cant perform this!", 400)
+      throw new AppError("sorry you cant perform this!", 400,)
     }
 
     sendSuccess(res, 200, "Comment deleted successfully")
+
   })
 
   public UpdateComment = catchAsync(async(req:Request, res:Response)=>{
+    const userId = req.user?._id
     const comment = await EpisodeComment.findById(req.params.id)
 
     if (!comment){
         throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment.userId == req.body.userId){
+    if(comment.userId.toString() == userId){
         await EpisodeComment.updateOne(
           {$set: req.body},
         )

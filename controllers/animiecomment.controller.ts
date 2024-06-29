@@ -55,11 +55,8 @@ export class AnimieCommentController{
       {
         path: 'parentComment', 
         populate: { path: 'parentComment', /* continue as deep as necessary */ 
-
       }
-        
       },
-      
     ]).sort({_id:1}).exec();
     
     if (!comment){
@@ -82,17 +79,18 @@ export class AnimieCommentController{
 
   public DeleteComment = catchAsync(async(req:Request, res:Response)=>{
     const {commentId, animieId} = req.params;
-    const comment= await AnimieComment.findOne({_id:commentId, animieId}).lean();
+    const userId = req.user?._id
+    const comment= await AnimieComment.findById({_id:commentId, animieId}).lean();
 
     if (!comment){
       throw new AppError("No Comment with this id found", 404)
     }
 
-    if(comment && comment.userId === req.body.userId){
-      await AnimieComment.deleteMany({_id:{$in:comment.replies}})
-      await AnimieComment.deleteOne();
+    if(comment && comment.userId.toString() == userId){
+        await AnimieComment.deleteMany({_id:{$in:comment.replies}})
+          await AnimieComment.deleteOne({_id:commentId});
     } else {
-      throw new AppError("sorry you cant perform this!", 400)
+      throw new AppError("sorry you cant perform this!", 400,)
     }
 
     sendSuccess(res, 200, "Comment deleted successfully")
@@ -135,9 +133,9 @@ export class AnimieCommentController{
     }
 
     const newReply = await new AnimieComment(replyObj).save();
-    const result = await AnimieComment.findOneAndUpdate({_id:commentId, animieId}, {$push:{replies:newReply._id}});
+    await AnimieComment.findOneAndUpdate({_id:commentId, animieId}, {$push:{replies:newReply._id}});
 
-    sendSuccess(res, 200, result)
+    sendSuccess(res, 200, newReply)
   })
 
   // public toggleLike = catchAsync(async(req:Request, res:Response)=>{
@@ -170,27 +168,27 @@ export class AnimieCommentController{
     const {commentId} = req.params;
     const userId = req.user?._id;
 
-    const comment = await AnimieComment.findByIdAndUpdate(
+    await AnimieComment.findByIdAndUpdate(
       {_id:commentId},
       // Add userId to likes array if not already present
       { $addToSet: { likes: userId } },
       { new: true }
   );
 
-    sendSuccess(res, 200, comment, "Comment Unliked")
+    sendSuccess(res, 200,"Comment liked")
   })
 
   public unlikeComment = catchAsync(async(req:Request, res:Response)=>{
     const {commentId} = req.params;
     const userId = req.user?._id;
 
-    const comment = await AnimieComment.findByIdAndUpdate(
+    await AnimieComment.findByIdAndUpdate(
       {_id:commentId},
        // Remove userId from likes array
       { $pull: { likes: userId } },
       { new: true }
   );
 
-    sendSuccess(res, 200, comment, "Comment Unliked")
+    sendSuccess(res, 200, "Comment Unliked")
   })
 };

@@ -149,7 +149,7 @@ export class CommentController{
       { new: true }
   );
 
-    sendSuccess(res, 200, comment, "Comment Unliked")
+    sendSuccess(res, 200, comment, "Comment liked")
   })
 
   public unlikeComment = catchAsync(async(req:Request, res:Response)=>{

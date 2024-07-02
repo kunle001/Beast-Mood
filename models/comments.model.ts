@@ -5,55 +5,54 @@ export interface IAnimieComment extends Document {
   userId: Types.ObjectId;
   animieId: Types.ObjectId;
   message: string;
+  parentComment: Types.ObjectId;
+  replies: Types.ObjectId;
+  likes: string[];
 }
 
-// Anime Comment schema
-export interface IAnimeComment extends Document {
-  userId: mongoose.Types.ObjectId;
-  animeId: mongoose.Types.ObjectId;
-  message: string;
-}
-
-const animeCommentSchema = new Schema<IAnimeComment>(
+const animieCommentSchema = new Schema<IAnimieComment>(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    animeId: {
+    animieId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Anime",
+      ref: "Animie",
     },
     message: {
       type: String,
       required: [true, "Comment must not be empty!"],
     },
-  },
-  {
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-      virtuals: true,
+    parentComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AnimieComment",
+      default: null,
     },
-    toObject: { virtuals: true },
-  }
+    replies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "AnimieComment",
+      },
+    ],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Assuming 'User' is the model name for users
+  },
+  { timestamps: true }
 );
-
-// Middleware to populate the user data before find operation
-animeCommentSchema.pre("find", function (next) {
-  this.populate("userId", "-password"); // Assuming password should not be exposed
+// Always populate the userId field
+animieCommentSchema.pre("findOne", function (next) {
+  this.populate({ path: "replies" });
   next();
 });
-
-const AnimieComment = mongoose.model("AnimieComment", animeCommentSchema);
 
 //Episode Comment schema
 export interface IEpisodeComment extends Document {
   userId: Types.ObjectId;
   episodeId: Types.ObjectId;
   message: string;
+  parentComment: Types.ObjectId;
+  replies: Types.ObjectId;
+  likes: string[];
 }
 
 const episodeCommentSchema = new Schema<IEpisodeComment>(
@@ -70,24 +69,24 @@ const episodeCommentSchema = new Schema<IEpisodeComment>(
       type: String,
       required: [true, "Comment must not be empty!"],
     },
-  },
-  {
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-      virtuals: true,
+    parentComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "EpisodeComment",
+      default: null,
     },
-    toObject: { virtuals: true },
-  }
+    replies: [{ type: mongoose.Schema.Types.ObjectId, ref: "EpisodeComment" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Assuming 'User' is the model name for users
+  },
+  { timestamps: true }
 );
 
-episodeCommentSchema.pre("find", function (next) {
-  this.populate("userId", "-password"); // Assuming password should not be exposed
+// Always populate the userId field
+episodeCommentSchema.pre("findOne", function (next) {
+  this.populate({ path: "replies" });
   next();
 });
 
+const AnimieComment = mongoose.model("AnimieComment", animieCommentSchema);
 const EpisodeComment = mongoose.model("EpisodeComment", episodeCommentSchema);
 
 export { AnimieComment, EpisodeComment };

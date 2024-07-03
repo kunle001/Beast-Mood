@@ -20,6 +20,7 @@ router
 router
   .route("/like/:commentId")
   .post(authenticate, commentController.likeComment);
+
 router
   .route("/unlike/:commentId")
   .post(authenticate, commentController.unlikeComment);

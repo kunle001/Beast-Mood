@@ -1,42 +1,41 @@
-import express from "express"
-import { AnimieController } from "../controllers/animie.controller"
-import { upload, uploadImage, uploadSingleImage, uploadVideo } from "../utils/upload"
-import { ValidationSchema } from "../utils/global"
-import { validateRequest } from "../utils/validators"
+import express from "express";
+import { AnimieController } from "../controllers/animie.controller";
+import {
+  upload,
+  uploadImage,
+  uploadSingleImage,
+  uploadVideo,
+} from "../utils/upload";
+import { ValidationSchema } from "../utils/global";
+import { validateRequest } from "../utils/validators";
 
-const router= express.Router()
-const animieController= new AnimieController()
-const validator= new ValidationSchema()
+const router = express.Router();
+const animieController = new AnimieController();
+const validator = new ValidationSchema();
 
-router.route("/").get(animieController.GetAnimies)
-router.route("/create").post(
+router.route("/").get(animieController.GetAnimies);
+router
+  .route("/create")
+  .post(
     uploadSingleImage.single("image"),
-    uploadImage, 
+    uploadImage,
     validateRequest(validator.createAnimie()),
     animieController.CreateAnimie
-)
+  );
 
-router.route("/create").patch(
+router
+  .route("/:id")
+  .patch(
     uploadSingleImage.single("image"),
-    uploadImage, 
+    uploadImage,
     validateRequest(validator.updateAnime()),
     animieController.UpdateAnimie
-)
+  );
 
+router.route("/:id").get(animieController.GetOneAnimie);
 
+router.route("/:id").delete(animieController.DeleteAnimie);
 
-router.route("/:id").get(
-    animieController.GetOneAnimie
-)
+router.route("/").get(animieController.GetAnimies);
 
-router.route("/:id").delete(
-    animieController.DeleteAnimie
-)
-
-router.route("/").get(
-    animieController.GetAnimies
-)
-
-
-
-export {router as AnimieRouter}
+export { router as AnimieRouter };

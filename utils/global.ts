@@ -22,6 +22,7 @@ export class ValidationSchema {
       image: this.largeTextRq(true),
       description: this.largeTextRq(),
       episode_number: Joi.number().required(),
+      season: Joi.number().required(),
     });
   }
 

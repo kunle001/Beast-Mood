@@ -7,7 +7,8 @@ import { Animie } from "../models/animies.model";
 
 export class EpisodesController {
   public CreateEpisode = catchAsync(async (req: Request, res: Response) => {
-    const { image, url, episode_number, title, description, animie } = req.body;
+    const { image, url, episode_number, title, description, animie, season } =
+      req.body;
 
     const episode = Episode.build({
       image,
@@ -16,6 +17,7 @@ export class EpisodesController {
       title,
       description,
       animie,
+      season,
     });
 
     await episode.save();

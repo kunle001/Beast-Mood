@@ -8,6 +8,7 @@ interface EpisodeAttrs {
   url: string;
   animie: mongoose.Types.ObjectId;
   episode_number: number;
+  season: number;
 }
 
 interface EpisodeDoc extends Document {
@@ -18,6 +19,7 @@ interface EpisodeDoc extends Document {
   url: string;
   animie: mongoose.Types.ObjectId;
   episode_number: number;
+  season: number;
 }
 
 interface EpisodeModel extends Model<EpisodeDoc> {
@@ -37,6 +39,7 @@ const episodeSchema = new Schema<EpisodeDoc>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Animie",
     },
+    season: Number,
     views: {
       type: Number,
       default: 0,

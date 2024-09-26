@@ -14,6 +14,7 @@ const animieController = new AnimieController();
 const validator = new ValidationSchema();
 
 router.route("/").get(animieController.GetAnimies);
+router.route("/trending").get(animieController.getTrendingAnimes);
 router
   .route("/create")
   .post(

@@ -41,6 +41,14 @@ export class EpisodesController {
 
   public GetEpisode = catchAsync(async (req: Request, res: Response) => {
     const episode = await Episode.findById(req.params.id).populate("comments");
+
+    if (!episode) {
+      throw new AppError("could not find episode with this id", 400);
+    }
+    episode.set({
+      views: episode.views + 1,
+    });
+    await episode.save();
     sendSuccess(res, 200, episode);
   });
 

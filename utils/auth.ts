@@ -77,7 +77,7 @@ const addTokonToCookie = (res:any, userId: string, roles: string[], email: strin
 };
 
 const clearToken = (res: Response) => {
-  res.cookie("jwt", "", {
+  res.cookie("token", "", {
     httpOnly: true,
     expires: new Date(0),
   });

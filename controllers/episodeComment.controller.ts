@@ -11,9 +11,9 @@ export class CommentController {
     const episodeId = req.params.episodeId;
     const existingUser = req.user?._id;
 
-    const isAnimeExist = await Episode.findById(episodeId);
+    const isEpisodeExist = await Episode.findById(episodeId);
 
-    if (!isAnimeExist) {
+    if (!isEpisodeExist) {
       throw new AppError("Episode does not exist", 404);
     }
 
@@ -49,6 +49,7 @@ export class CommentController {
       throw new AppError(e, 500);
     }
   };
+
   public GetOneEpisodeComment = catchAsync(
     async (req: Request, res: Response) => {
       const comment = await EpisodeComment.findById(req.params.id)
@@ -144,31 +145,69 @@ export class CommentController {
     sendSuccess(res, 200, allReply);
   });
 
-  public likeComment = catchAsync(async (req: Request, res: Response) => {
+  public toggleLike = catchAsync(async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const userId = req.user?._id;
 
-    const comment = await EpisodeComment.findByIdAndUpdate(
-      commentId,
-      // Add userId to likes array if not already present
-      { $addToSet: { likes: userId } },
-      { new: true }
-    );
+    if(!userId) {
+      throw new AppError("User is not authenticated", 401);
+    }
+    
+    const comment = await EpisodeComment.findById(commentId);
+    if (!comment) throw new AppError("Comment not found", 404);
 
-    sendSuccess(res, 200, comment, "Comment liked");
+    // Check if the user already liked the comment
+    const hasLiked = comment.likes.includes(userId);
+
+    if(hasLiked) {
+      // Unlike the comment by pulling the userId from likes
+      await EpisodeComment.findByIdAndUpdate(
+        { _id: commentId },
+        { $pull: { likes: userId } },  // Removes userId from likes array
+        { new: true }
+      );
+      sendSuccess(res, 200, "Comment unliked");
+    } else {
+      // Like the comment by adding the userId to the likes array
+      await EpisodeComment.findByIdAndUpdate(
+        { _id: commentId },
+        { $addToSet: { likes: userId } }, // Adds userId to likes array (if not already there)
+        { new: true }
+      );
+      sendSuccess(res, 200, "Comment liked");
+    }
   });
 
-  public unlikeComment = catchAsync(async (req: Request, res: Response) => {
+  public toggleUnLike = catchAsync(async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const userId = req.user?._id;
-
-    const comment = await EpisodeComment.findByIdAndUpdate(
-      commentId,
-      // Remove userId from likes array
-      { $pull: { likes: userId } },
-      { new: true }
-    );
-
-    sendSuccess(res, 200, comment, "Comment Unliked");
+  
+    if(!userId) {
+      throw new AppError("User is not authenticated", 401); // Handle case where userId is undefined
+    }
+    
+    const comment = await EpisodeComment.findById(commentId);
+    if (!comment) throw new AppError("Comment not found", 404);
+  
+    // Check if the user already disLikes the comment
+    const hasDisLikes = comment.disLikes.includes(userId);
+  
+    if(hasDisLikes) {
+      // unDisLike the comment by pulling the userId from likes
+      await EpisodeComment.findByIdAndUpdate(
+        { _id: commentId },
+        { $pull: { disLikes: userId } },  // Removes userId from likes array
+        { new: true }
+      );
+      sendSuccess(res, 200, "Comment undiSLiked");
+    } else {
+      // disLikes the comment by adding the userId to the likes array
+      await EpisodeComment.findByIdAndUpdate(
+        { _id: commentId },
+        { $addToSet: { disLikes: userId } }, // Adds userId to disLikes array (if not already there)
+        { new: true }
+      );
+      sendSuccess(res, 200, "Comment disLikes");
+    }
   });
 }

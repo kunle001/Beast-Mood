@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
-import { generateToken, clearToken } from "../utils/auth";
+import { generateToken, clearToken, addTokonToCookie } from "../utils/auth";
 import { sendSuccess } from "../utils/response";
 import AppError from "../utils/appError";
 import { catchAsync } from "../utils/catchAsync";
@@ -15,7 +15,7 @@ import UserOTPRecord from "../models/userOtpRecord.model";
 
 class AuthController {
   public Register = catchAsync(async (req: Request, res: Response) => {
-    let { name, email, password } = req.body;
+    let { name, email, password, profilePic} = req.body;
     email = email?.trim();
     password = password?.trim();
 
@@ -36,12 +36,11 @@ class AuthController {
     const user = await User.create({
       name,
       email,
+      profilePic,
       password,
     });
 
     if (user) {
-      await generateToken(user._id);
-
       // Send OTP email for user to Verify his email and also create new OTP Record in DB
       await sendOTPemail(user, UserOTPRecord);
 
@@ -52,6 +51,58 @@ class AuthController {
     } else {
       throw new AppError("The user already exists", 400);
     }
+  });
+
+  
+  // public createAdmin = catchAsync(async(req: Request, res: Response) => {
+  //   const { name, email, password } = req.body;
+
+  //     // Check if user already exists
+  //     let user = await User.findOne({ email });
+  //     if (user) {
+  //       return res.status(400).json({ message: 'User already exists' });
+  //     }
+  
+  //     // Create new admin
+  //     user = new User({
+  //       name,
+  //       email,
+  //       password,
+  //       roles: 'admin',
+  //     });
+
+  //     await user.save();
+
+  //   if (user) {
+  //     generateToken(user._id, user.roles, user.email);
+
+  //     // Send OTP email for user to Verify his email and also create new OTP Record in DB
+  //     await sendOTPemail(user,  UserOTPRecord);
+
+  //     return sendSuccess(res, 201, {message:"Check your email for a verification otp!", user})
+
+  //   }
+
+  // });
+
+  public addExistingUserAsAdmin = catchAsync(async(req: Request, res: Response) => {
+    // Check if user already exists
+    const user = await User.findById({_id:req.params.id});
+
+    if (!user) {
+      return res.status(400).json({ message: 'user dont exist' });
+    }
+
+    if (user && (user!.roles.includes("admin"))) {
+      return res.status(400).json({ message: 'User already admin' });
+    }
+
+    await user?.updateOne({
+      roles: "admin"
+    })
+
+    return sendSuccess(res, 200, {message:"Admin created successfully"})
+
   });
 
   public verifyotp = catchAsync(async (req: Request, res: Response) => {
@@ -107,6 +158,42 @@ class AuthController {
     }
   });
 
+  public resendotp = catchAsync(async(req: Request, res: Response) => {
+    let { email } = req.body;
+    email = email?.trim();
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser!.verifiedEmail) {
+      return res.status(403).json({ err: "You don't have need for new OTP" });
+    }
+
+    if (!email) {
+      throw new AppError("Please Enter Your Email", 401)
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      throw new AppError("Email is Invalid", 401);
+    } else if (!existingUser) {
+      throw new AppError("This account doesn't exist", 400);
+    } else {
+      //  Check if user has a valid OTP Previously to avaoid multiple requests
+      const existingValidOTP = await UserOTPRecord.findOne({
+        userId: existingUser.id,
+        expiresAt: { $gte: Date.now() },
+      });
+
+      if (existingValidOTP)
+        throw new AppError("Your previous OTP is still Valid, Use it", 400);
+
+      // Delete Expired OTP and Send a New One
+      await UserOTPRecord.deleteOne({ userId: existingUser.id });
+
+      //  Call the OTP Email sending function and also create new OTP record
+      await sendOTPemail(existingUser, UserOTPRecord);
+
+      return sendSuccess(res, 200, {message:"Check your email for a verification otp!"})
+    }
+  });
+
   public Login = catchAsync(async (req: Request, res: Response) => {
     const { email, password, verifiedEmail } = req.body;
     const user = await User.findOne({ email });
@@ -115,8 +202,9 @@ class AuthController {
       throw new AppError("Unverified account", 403);
     }
 
-    if (user && (await user.comparePassword(password))) {
-      const token = await generateToken(user._id);
+    if (user && (user.comparePassword(password))) {
+      const token = generateToken(user._id, user.roles, email);
+      addTokonToCookie(res, user._id, user.roles, email)
       return sendSuccess(res, 200, {
         user,
         token: token,
@@ -125,6 +213,29 @@ class AuthController {
       throw new AppError("User not found / password incorrect", 400);
     }
   });
+
+  public adminLogin = catchAsync(async(req: Request, res: Response) => {
+
+    const {email, password} = req.body;
+    const user = await User.findOne({email})
+
+    if(user && (user.verifiedEmail == false)) {
+      throw new AppError("Unverified account", 403)
+    };
+
+    if(user && (user.comparePassword(password))){
+      return sendSuccess(res, 200, {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        roles: user.roles,
+      });
+    }
+    else{
+      throw new AppError("User not found / password incorrect", 400);
+    }
+  })
+
 
   public forgotPassword = catchAsync(async (req: Request, res: Response) => {
     const resetLink = passLink;
@@ -142,7 +253,7 @@ class AuthController {
     //Generate and set password reset token
     const getToken = createTokenUser(user);
 
-    user.resetToken = generateToken(getToken.userId);
+    user.resetToken = generateToken(getToken.userId, user.roles, email);
     await user.save();
 
     const link = `${process.env.CLIENT_URL}/reset-password/${user.resetToken}`;

@@ -8,6 +8,7 @@ export interface IAnimieComment extends Document {
   parentComment: Types.ObjectId;
   replies: Types.ObjectId;
   likes: string[];
+  disLikes:string[];
 }
 
 const animieCommentSchema = new Schema<IAnimieComment>(
@@ -36,6 +37,7 @@ const animieCommentSchema = new Schema<IAnimieComment>(
       },
     ],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Assuming 'User' is the model name for users
+    disLikes:[{ type:mongoose.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );
@@ -53,6 +55,7 @@ export interface IEpisodeComment extends Document {
   parentComment: Types.ObjectId;
   replies: Types.ObjectId;
   likes: string[];
+  disLikes:string[];
 }
 
 const episodeCommentSchema = new Schema<IEpisodeComment>(
@@ -76,6 +79,7 @@ const episodeCommentSchema = new Schema<IEpisodeComment>(
     },
     replies: [{ type: mongoose.Schema.Types.ObjectId, ref: "EpisodeComment" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Assuming 'User' is the model name for users
+    disLikes:[{ type:mongoose.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

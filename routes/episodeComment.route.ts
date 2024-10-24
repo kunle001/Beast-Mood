@@ -19,10 +19,10 @@ router
   .post(authenticate, commentController.ReplyComment);
 router
   .route("/like/:commentId")
-  .post(authenticate, commentController.likeComment);
+  .post(authenticate, commentController.toggleLike);
 
 router
   .route("/unlike/:commentId")
-  .post(authenticate, commentController.unlikeComment);
+  .post(authenticate, commentController.toggleUnLike);
 
 export { router as EpisodeCommentRouter };

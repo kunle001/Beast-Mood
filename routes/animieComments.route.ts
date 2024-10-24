@@ -10,7 +10,9 @@ router.route("/getAllComment").get(commentController.GetComments)
 router.route("/getOneComment/:id").get(commentController.GetOneAnimieComment)
 router.route("/updateComment/:id").put(commentController.UpdateComment)
 router.route("/deleteComment/:id").delete(commentController.DeleteComment)
-
+router.route("/replyComment/:commentId/reply/:animieId").post(authenticate, commentController.ReplyComment)
+router.route("/like/:commentId").post(authenticate, commentController.toggleLike)
+router.route("/unlike/:commentId").post(authenticate, commentController.toggleUnLike)
 
 
 export {router as AnimieCommentRouter}
